@@ -1,14 +1,14 @@
+import CameraActions from './components/CameraActions';
 import CameraView from './components/CameraView';
+import { CameraProvider } from './states/Camera.context';
 
-function App() {
+const App = () => {
     return (
-        <>
-            <h1 class="bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3">
-                Hello World!
-            </h1>
+        <CameraProvider>
             <CameraView />
-        </>
+            <CameraActions/>
+        </CameraProvider>
     );
-}
+};
 
 export default App;
