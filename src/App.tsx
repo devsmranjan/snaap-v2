@@ -1,13 +1,14 @@
-import CameraView from "./components/CameraView";
+import CameraView from './components/CameraView';
 
 function App() {
-
-  return (
-    <>
-      <h1>Hello World!</h1>
-      <CameraView />
-    </>
-  );
+    return (
+        <>
+            <h1 class="bg-sky-700 px-4 py-2 text-white hover:bg-sky-800 sm:px-8 sm:py-3">
+                Hello World!
+            </h1>
+            <CameraView />
+        </>
+    );
 }
 
 export default App;
