@@ -1,28 +1,29 @@
 import { createSignal } from 'solid-js';
 import { effect } from 'solid-js/web';
+
 import { useCameraContext } from '../states/Camera.context';
 
 const CameraView = () => {
-    const { stream, hasPermission } = useCameraContext();
+    const { hasPermission, setCameraViewRef } = useCameraContext();
 
-    const [cameraViewRef, setCameraViewRef] = createSignal(null);
+    const [viewRef, setViewRef] = createSignal(null);
 
     effect(() => {
         if (hasPermission()) {
-            const viewRef: HTMLVideoElement | null = cameraViewRef();
+            const ref: HTMLVideoElement | null = viewRef();
 
-            if (!viewRef) {
+            if (!ref) {
                 return;
             }
 
-            (viewRef as HTMLVideoElement).srcObject = stream();
+            setCameraViewRef(ref);
         }
     });
 
     return (
         <>
             {hasPermission() ? (
-                <video ref={setCameraViewRef} autoplay playsinline muted />
+                <video ref={setViewRef} autoplay playsinline muted />
             ) : (
                 <p>no permission</p>
             )}

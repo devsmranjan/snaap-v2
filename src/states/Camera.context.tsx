@@ -1,5 +1,9 @@
 import { JSX, createContext, createSignal, useContext } from 'solid-js';
+import { effect } from 'solid-js/web';
 
+const [cameraViewRef, setCameraViewRef] = createSignal<HTMLVideoElement | null>(
+    null
+);
 const [stream, setStream] = createSignal<MediaStream | null>(null);
 const [recorder, setRecorder] = createSignal<MediaRecorder | null>(null);
 const [chunks, setChunks] = createSignal<BlobPart[]>([]);
@@ -76,14 +80,62 @@ const stopRecording = () => {
     r.stop();
 };
 
+const takePhoto = (filterColor?: string | null) => {
+    const element = cameraViewRef();
+
+    if (!element) {
+        console.error('element is null');
+        return;
+    }
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+        console.error('context is null');
+        return;
+    }
+
+    const width = element.videoWidth;
+    const height = element.videoHeight;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    context.filter = filterColor ?? 'none';
+    context.drawImage(element, 0, 0, width, height);
+
+    const url = canvas.toDataURL('image/png');
+
+    // download
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'image.png';
+    a.click();
+
+    setMediaUrl(url);
+};
+
 init();
+
+effect(() => {
+    const ref = cameraViewRef();
+
+    if (!ref) {
+        return;
+    }
+
+    ref.srcObject = stream();
+});
 
 const CameraContext = createContext(
     {
-        stream,
-        mediaUrl,
+        setCameraViewRef,
+        cameraViewRef,
         startRecording,
         stopRecording,
+        takePhoto,
         hasPermission,
     },
     { name: 'CameraContext' }
@@ -97,10 +149,11 @@ export const CameraProvider = (props: CameraProviderProps) => {
     return (
         <CameraContext.Provider
             value={{
-                stream,
-                mediaUrl,
+                setCameraViewRef,
+                cameraViewRef,
                 startRecording,
                 stopRecording,
+                takePhoto,
                 hasPermission,
             }}
         >
