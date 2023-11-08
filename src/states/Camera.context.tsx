@@ -1,4 +1,7 @@
 import { JSX, createContext, createSignal, useContext } from 'solid-js';
+
+type MediaOptionType = 'video' | 'photo';
+
 import { effect } from 'solid-js/web';
 
 const [cameraViewRef, setCameraViewRef] = createSignal<HTMLVideoElement | null>(
@@ -9,6 +12,7 @@ const [recorder, setRecorder] = createSignal<MediaRecorder | null>(null);
 const [chunks, setChunks] = createSignal<BlobPart[]>([]);
 const [mediaUrl, setMediaUrl] = createSignal<string | null>(null);
 const [hasPermission, setHasPermission] = createSignal<boolean>(true);
+const [mediaOption, setMediaOption] = createSignal<MediaOptionType>('video');
 
 const init = async () => {
     try {
@@ -109,10 +113,10 @@ const takePhoto = (filterColor?: string | null) => {
 
     // download
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'image.png';
-    a.click();
+    // const a = document.createElement('a');
+    // a.href = url;
+    // a.download = 'image.png';
+    // a.click();
 
     setMediaUrl(url);
 };
@@ -137,6 +141,8 @@ const CameraContext = createContext(
         stopRecording,
         takePhoto,
         hasPermission,
+        mediaOption,
+        setMediaOption,
     },
     { name: 'CameraContext' }
 );
@@ -155,6 +161,8 @@ export const CameraProvider = (props: CameraProviderProps) => {
                 stopRecording,
                 takePhoto,
                 hasPermission,
+                mediaOption,
+                setMediaOption,
             }}
         >
             {props.children}
