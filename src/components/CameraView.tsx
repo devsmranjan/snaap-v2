@@ -23,7 +23,13 @@ const CameraView = () => {
     return (
         <>
             {hasPermission() ? (
-                <video ref={setViewRef} autoplay playsinline muted />
+                <video
+                    ref={setViewRef}
+                    autoplay
+                    playsinline
+                    muted
+                    class="h-full"
+                />
             ) : (
                 <p>no permission</p>
             )}

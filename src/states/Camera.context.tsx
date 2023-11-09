@@ -13,6 +13,7 @@ const [chunks, setChunks] = createSignal<BlobPart[]>([]);
 const [mediaUrl, setMediaUrl] = createSignal<string | null>(null);
 const [hasPermission, setHasPermission] = createSignal<boolean>(true);
 const [mediaOption, setMediaOption] = createSignal<MediaOptionType>('video');
+const [recording, setRecording] = createSignal<boolean>(false);
 
 const init = async () => {
     try {
@@ -44,11 +45,7 @@ const init = async () => {
             const url = URL.createObjectURL(blob);
 
             // download
-
-            // const a = document.createElement('a');
-            // a.href = url;
-            // a.download = 'video.mp4';
-            // a.click();
+            download(url);
 
             setMediaUrl(url);
         };
@@ -71,6 +68,8 @@ const startRecording = () => {
     }
 
     r.start();
+
+    setRecording(true);
 };
 
 const stopRecording = () => {
@@ -82,6 +81,8 @@ const stopRecording = () => {
     }
 
     r.stop();
+
+    setRecording(false);
 };
 
 const takePhoto = (filterColor?: string | null) => {
@@ -112,13 +113,16 @@ const takePhoto = (filterColor?: string | null) => {
     const url = canvas.toDataURL('image/png');
 
     // download
-
-    // const a = document.createElement('a');
-    // a.href = url;
-    // a.download = 'image.png';
-    // a.click();
+    download(url);
 
     setMediaUrl(url);
+};
+
+const download = (url: string) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = mediaOption() === 'video' ? 'video.mp4' : 'photo.png';
+    a.click();
 };
 
 init();
@@ -143,6 +147,7 @@ const CameraContext = createContext(
         hasPermission,
         mediaOption,
         setMediaOption,
+        recording,
     },
     { name: 'CameraContext' }
 );
@@ -163,6 +168,7 @@ export const CameraProvider = (props: CameraProviderProps) => {
                 hasPermission,
                 mediaOption,
                 setMediaOption,
+                recording,
             }}
         >
             {props.children}

@@ -4,15 +4,26 @@ const MediaOptions = () => {
     const { mediaOption, setMediaOption } = useCameraContext();
 
     return (
-        <div>
+        <div class="w-100 flex h-full items-center justify-center gap-2">
             <button
-                class={mediaOption() === 'video' ? 'active' : ''}
+                type="button"
+                class={`rounded-full border border-gray-300 px-7 py-2 text-xs font-medium  transition focus:outline-none ${
+                    mediaOption() === 'video'
+                        ? 'bg-white text-gray-900'
+                        : 'bg-transparent text-white'
+                }`}
                 onClick={() => setMediaOption('video')}
             >
                 Video
             </button>
+
             <button
-                class={mediaOption() === 'photo' ? 'active' : ''}
+                type="button"
+                class={`rounded-full border border-gray-300 px-7 py-2 text-xs font-medium  transition focus:outline-none ${
+                    mediaOption() === 'photo'
+                        ? 'bg-white text-gray-900'
+                        : 'bg-transparent text-white'
+                }`}
                 onClick={() => setMediaOption('photo')}
             >
                 Photo
