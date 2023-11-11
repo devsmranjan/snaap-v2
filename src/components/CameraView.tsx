@@ -4,7 +4,7 @@ import { effect } from 'solid-js/web';
 import { useCameraContext } from '../states/Camera.context';
 
 const CameraView = () => {
-    const { hasPermission, setCameraViewRef } = useCameraContext();
+    const { hasPermission, setCameraViewRef, filterColor } = useCameraContext();
 
     const [viewRef, setViewRef] = createSignal(null);
 
@@ -21,7 +21,7 @@ const CameraView = () => {
     });
 
     return (
-        <>
+        <div class="relative flex h-full w-full justify-center">
             {hasPermission() ? (
                 <video
                     ref={setViewRef}
@@ -33,7 +33,14 @@ const CameraView = () => {
             ) : (
                 <p>no permission</p>
             )}
-        </>
+
+            <div
+                class="absolute inset-0 h-full w-full"
+                style={{
+                    'background-color': filterColor(),
+                }}
+            ></div>
+        </div>
     );
 };
 

@@ -1,8 +1,13 @@
 import { JSX, createContext, createSignal, useContext } from 'solid-js';
+import { effect } from 'solid-js/web';
 
 type MediaOptionType = 'video' | 'photo';
-
-import { effect } from 'solid-js/web';
+type FilterColorType =
+    | 'transparent'
+    | '#ff000030'
+    | '#1100ff30'
+    | '#15ff0030'
+    | '#ff008030';
 
 const [cameraViewRef, setCameraViewRef] = createSignal<HTMLVideoElement | null>(
     null
@@ -14,6 +19,11 @@ const [mediaUrl, setMediaUrl] = createSignal<string | null>(null);
 const [hasPermission, setHasPermission] = createSignal<boolean>(true);
 const [mediaOption, setMediaOption] = createSignal<MediaOptionType>('video');
 const [recording, setRecording] = createSignal<boolean>(false);
+const [availableFilters, setAvailableFilters] = createSignal<FilterColorType[]>(
+    []
+);
+const [filterColor, setFilterColor] =
+    createSignal<FilterColorType>('transparent');
 
 const init = async () => {
     try {
@@ -85,7 +95,7 @@ const stopRecording = () => {
     setRecording(false);
 };
 
-const takePhoto = (filterColor?: string | null) => {
+const takePhoto = () => {
     const element = cameraViewRef();
 
     if (!element) {
@@ -107,8 +117,10 @@ const takePhoto = (filterColor?: string | null) => {
     canvas.width = width;
     canvas.height = height;
 
-    context.filter = filterColor ?? 'none';
     context.drawImage(element, 0, 0, width, height);
+
+    context.fillStyle = filterColor() ?? 'none';
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
     const url = canvas.toDataURL('image/png');
 
@@ -137,6 +149,23 @@ effect(() => {
     ref.srcObject = stream();
 });
 
+effect(() => {
+    if (mediaOption() === 'video') {
+        setFilterColor('transparent');
+        setAvailableFilters([]);
+
+        return;
+    }
+
+    setAvailableFilters([
+        'transparent',
+        '#ff000030',
+        '#1100ff30',
+        '#15ff0030',
+        '#ff008030',
+    ]);
+});
+
 const CameraContext = createContext(
     {
         setCameraViewRef,
@@ -148,6 +177,9 @@ const CameraContext = createContext(
         mediaOption,
         setMediaOption,
         recording,
+        filterColor,
+        setFilterColor,
+        availableFilters,
     },
     { name: 'CameraContext' }
 );
@@ -169,6 +201,9 @@ export const CameraProvider = (props: CameraProviderProps) => {
                 mediaOption,
                 setMediaOption,
                 recording,
+                filterColor,
+                setFilterColor,
+                availableFilters,
             }}
         >
             {props.children}
