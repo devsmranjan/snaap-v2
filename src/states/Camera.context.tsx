@@ -19,6 +19,7 @@ const [mediaUrl, setMediaUrl] = createSignal<string | null>(null);
 const [hasPermission, setHasPermission] = createSignal<boolean>(true);
 const [mediaOption, setMediaOption] = createSignal<MediaOptionType>('video');
 const [recording, setRecording] = createSignal<boolean>(false);
+const [micEnabled, setMicEnabled] = createSignal<boolean>(true);
 const [availableFilters, setAvailableFilters] = createSignal<FilterColorType[]>(
     []
 );
@@ -166,6 +167,20 @@ effect(() => {
     ]);
 
     stopRecording();
+    setMicEnabled(true);
+});
+
+effect(() => {
+    const audioTracks = stream()?.getAudioTracks() ?? [];
+
+    if (micEnabled()) {
+        // enable mic
+        audioTracks.forEach((track) => (track.enabled = true));
+        return;
+    }
+
+    // disable mic
+    audioTracks.forEach((track) => (track.enabled = false));
 });
 
 const CameraContext = createContext(
@@ -182,6 +197,8 @@ const CameraContext = createContext(
         filterColor,
         setFilterColor,
         availableFilters,
+        micEnabled,
+        setMicEnabled,
     },
     { name: 'CameraContext' }
 );
@@ -206,6 +223,8 @@ export const CameraProvider = (props: CameraProviderProps) => {
                 filterColor,
                 setFilterColor,
                 availableFilters,
+                micEnabled,
+                setMicEnabled,
             }}
         >
             {props.children}

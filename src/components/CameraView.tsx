@@ -20,7 +20,7 @@ const CameraView = () => {
     });
 
     return (
-        <div class="relative flex h-full w-full justify-center">
+        <div class="relative flex h-full justify-center">
             {hasPermission() ? (
                 <video
                     ref={setViewRef}
