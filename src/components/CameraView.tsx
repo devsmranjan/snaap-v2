@@ -1,5 +1,4 @@
-import { createSignal } from 'solid-js';
-import { effect } from 'solid-js/web';
+import { createEffect, createSignal } from 'solid-js';
 
 import { useCameraContext } from '../states/Camera.context';
 
@@ -8,7 +7,7 @@ const CameraView = () => {
 
     const [viewRef, setViewRef] = createSignal(null);
 
-    effect(() => {
+    createEffect(() => {
         if (hasPermission()) {
             const ref: HTMLVideoElement | null = viewRef();
 

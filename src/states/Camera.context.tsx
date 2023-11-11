@@ -164,6 +164,8 @@ effect(() => {
         '#15ff0030',
         '#ff008030',
     ]);
+
+    stopRecording();
 });
 
 const CameraContext = createContext(
