@@ -1,37 +1,23 @@
-import CameraActions from './components/CameraActions';
-import CameraView from './components/CameraView';
-import Filters from './components/Filters';
-import LastMediaView from './components/LastMediaView';
-import MediaOptions from './components/MediaOptions';
-import RecordingTimer from './components/RecordingTimer';
+import { Route, Router, Routes } from '@solidjs/router';
+import { lazy } from 'solid-js';
 import { CameraProvider } from './states/Camera.context';
 import { DbProvider } from './states/Database.context';
 
 const App = () => {
-    return (
-        <div class="app-view">
-            <DbProvider>
-                <CameraProvider>
-                    <div class="app-view__float">
-                        <RecordingTimer />
-                    </div>
-                    <div class="app-view__left ">
-                        <Filters />
-                    </div>
-                    <div class="app-view__center">
-                        <CameraView />
-                    </div>
-                    <div class="app-view__right">
-                        <CameraActions />
-                        <LastMediaView />
-                    </div>
+    const Home = lazy(() => import('./pages/Home'));
+    const Gallery = lazy(() => import('./pages/Gallery'));
 
-                    <div class="app-view__bottom">
-                        <MediaOptions />
-                    </div>
-                </CameraProvider>
-            </DbProvider>
-        </div>
+    return (
+        <DbProvider>
+            <CameraProvider>
+                <Router>
+                    <Routes>
+                        <Route path="/" component={Home}></Route>
+                        <Route path="/gallery" component={Gallery}></Route>
+                    </Routes>
+                </Router>
+            </CameraProvider>
+        </DbProvider>
     );
 };
 
