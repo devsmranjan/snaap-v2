@@ -10,8 +10,10 @@ import {
 interface IDbContext {
     db: Accessor<IDBDatabase | null>;
     setDb: Setter<IDBDatabase | null>;
-    add: (type: 'video' | 'image', blob: Blob) => void;
     latestMedia: Accessor<IMediaData | null>;
+    mediaList: Accessor<IMediaData[]>;
+    add: (type: 'video' | 'image', blob: Blob) => void;
+    getAll: () => void;
 }
 
 interface IDbProps {
@@ -30,6 +32,7 @@ const DbContext = createContext<IDbContext>();
 export const DbProvider = (props: IDbProps) => {
     const [db, setDb] = createSignal<IDBDatabase | null>(null);
     const [latestMedia, setLatestMedia] = createSignal<IMediaData | null>(null);
+    const [mediaList, setMediaList] = createSignal<IMediaData[]>([]);
 
     ((dbName: string, version?: number) => {
         console.log('Init...');
@@ -95,6 +98,46 @@ export const DbProvider = (props: IDbProps) => {
         };
     };
 
+    const getAll = () => {
+        const database = db();
+
+        if (!database) {
+            return;
+        }
+
+        const transaction = database.transaction('media', 'readonly');
+        const store = transaction.objectStore('media');
+
+        // get all data
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            const mediaList: IMediaData[] = request.result;
+
+            if (!mediaList) {
+                return;
+            }
+
+            console.log(mediaList);
+
+            mediaList.forEach((media) => {
+                const url = URL.createObjectURL(media.blob);
+
+                media.mediaUrl = url;
+            });
+
+            setMediaList(mediaList);
+        };
+
+        request.onerror = () => {
+            console.error('error getting data');
+        };
+
+        transaction.oncomplete = () => {
+            console.log('transaction complete');
+        };
+    };
+
     const updateLatest = () => {
         const database = db();
 
@@ -139,7 +182,9 @@ export const DbProvider = (props: IDbProps) => {
     };
 
     return (
-        <DbContext.Provider value={{ db, setDb, add, latestMedia }}>
+        <DbContext.Provider
+            value={{ db, setDb, add, latestMedia, mediaList, getAll }}
+        >
             {props.children}
         </DbContext.Provider>
     );
