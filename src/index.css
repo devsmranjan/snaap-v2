@@ -54,6 +54,8 @@ body {
 .app-view__right {
     grid-area: right-view;
     /* border-left: 1px solid #e5e5e5; */
+
+    position: relative;
 }
 
 .app-view__bottom {

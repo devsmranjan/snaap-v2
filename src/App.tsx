@@ -1,6 +1,7 @@
 import CameraActions from './components/CameraActions';
 import CameraView from './components/CameraView';
 import Filters from './components/Filters';
+import LastMediaView from './components/LastMediaView';
 import MediaOptions from './components/MediaOptions';
 import RecordingTimer from './components/RecordingTimer';
 import { CameraProvider } from './states/Camera.context';
@@ -22,6 +23,7 @@ const App = () => {
                     </div>
                     <div class="app-view__right">
                         <CameraActions />
+                        <LastMediaView />
                     </div>
 
                     <div class="app-view__bottom">

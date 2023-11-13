@@ -48,7 +48,6 @@ export const CameraProvider = (props: CameraProviderProps) => {
     const [stream, setStream] = createSignal<MediaStream | null>(null);
     const [recorder, setRecorder] = createSignal<MediaRecorder | null>(null);
     const [chunks, setChunks] = createSignal<BlobPart[]>([]);
-    const [mediaUrl, setMediaUrl] = createSignal<string | null>(null);
     const [hasPermission, setHasPermission] = createSignal<boolean>(true);
     const [mediaOption, setMediaOption] =
         createSignal<MediaOptionType>('video');
@@ -134,14 +133,8 @@ export const CameraProvider = (props: CameraProviderProps) => {
                 console.log('recording stopped');
 
                 const blob = new Blob(chunks(), { type: 'video/mp4' });
-                const url = URL.createObjectURL(blob);
 
-                // download
-                download(url);
-
-                db.add('video', url);
-
-                setMediaUrl(url);
+                db.add('video', blob);
             };
 
             setRecorder(recorder);
@@ -153,12 +146,12 @@ export const CameraProvider = (props: CameraProviderProps) => {
         }
     })();
 
-    const download = (url: string) => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = mediaOption() === 'video' ? 'video.mp4' : 'photo.png';
-        a.click();
-    };
+    // const download = (url: string) => {
+    //     const a = document.createElement('a');
+    //     a.href = url;
+    //     a.download = mediaOption() === 'video' ? 'video.mp4' : 'photo.png';
+    //     a.click();
+    // };
 
     const startRecording = () => {
         const r = recorder();
@@ -214,16 +207,15 @@ export const CameraProvider = (props: CameraProviderProps) => {
         context.fillStyle = filterColor() ?? 'none';
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        const url = canvas.toDataURL('image/png');
+        // canvas to blob
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                console.error('blob is null');
+                return;
+            }
 
-        // download
-        download(url);
-
-        db.add('image', url);
-
-        // db.db();
-
-        setMediaUrl(url);
+            db.add('image', blob);
+        }, 'image/png');
     };
 
     return (

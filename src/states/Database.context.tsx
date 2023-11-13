@@ -10,7 +10,7 @@ import {
 interface IDbContext {
     db: Accessor<IDBDatabase | null>;
     setDb: Setter<IDBDatabase | null>;
-    add: (type: 'video' | 'image', mediaUrl: string) => void;
+    add: (type: 'video' | 'image', blob: Blob) => void;
     latestMedia: Accessor<IMediaData | null>;
 }
 
@@ -21,6 +21,7 @@ interface IDbProps {
 interface IMediaData {
     id: number;
     type: 'video' | 'image';
+    blob: Blob;
     mediaUrl: string;
 }
 
@@ -54,6 +55,8 @@ export const DbProvider = (props: IDbProps) => {
             const db = request.result;
 
             setDb(db);
+
+            updateLatest();
         };
 
         request.onerror = () => {
@@ -63,7 +66,7 @@ export const DbProvider = (props: IDbProps) => {
         };
     })('snaap', 2);
 
-    const add = (type: 'video' | 'image', mediaUrl: string) => {
+    const add = (type: 'video' | 'image', blob: Blob) => {
         const database = db();
 
         if (!database) {
@@ -75,7 +78,7 @@ export const DbProvider = (props: IDbProps) => {
 
         const id = Date.now();
 
-        const request = store.add({ id, type, mediaUrl });
+        const request = store.add({ id, type, blob });
 
         request.onsuccess = () => {
             console.log('data added');
@@ -114,7 +117,16 @@ export const DbProvider = (props: IDbProps) => {
 
             const latest = mediaList.at(-1) ?? null;
 
-            setLatestMedia(latest);
+            if (!latest) {
+                setLatestMedia(null);
+                return;
+            }
+
+            const url = URL.createObjectURL(latest?.blob);
+
+            console.log(url);
+
+            setLatestMedia({ ...latest, mediaUrl: url });
         };
 
         request.onerror = () => {
