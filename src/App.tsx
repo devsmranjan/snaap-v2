@@ -4,28 +4,31 @@ import Filters from './components/Filters';
 import MediaOptions from './components/MediaOptions';
 import RecordingTimer from './components/RecordingTimer';
 import { CameraProvider } from './states/Camera.context';
+import { DbProvider } from './states/Database.context';
 
 const App = () => {
     return (
         <div class="app-view">
-            <CameraProvider>
-                <div class="app-view__float">
-                    <RecordingTimer />
-                </div>
-                <div class="app-view__left ">
-                    <Filters />
-                </div>
-                <div class="app-view__center">
-                    <CameraView />
-                </div>
-                <div class="app-view__right">
-                    <CameraActions />
-                </div>
+            <DbProvider>
+                <CameraProvider>
+                    <div class="app-view__float">
+                        <RecordingTimer />
+                    </div>
+                    <div class="app-view__left ">
+                        <Filters />
+                    </div>
+                    <div class="app-view__center">
+                        <CameraView />
+                    </div>
+                    <div class="app-view__right">
+                        <CameraActions />
+                    </div>
 
-                <div class="app-view__bottom">
-                    <MediaOptions />
-                </div>
-            </CameraProvider>
+                    <div class="app-view__bottom">
+                        <MediaOptions />
+                    </div>
+                </CameraProvider>
+            </DbProvider>
         </div>
     );
 };
