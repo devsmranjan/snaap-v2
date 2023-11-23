@@ -261,6 +261,8 @@ export const DbProvider = (props: IDbProps) => {
             );
 
             setMediaList(updatedMediaList);
+
+            updateLatest();
         };
 
         request.onerror = () => {
