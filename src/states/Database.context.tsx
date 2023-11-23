@@ -14,13 +14,15 @@ interface IDbContext {
     mediaList: Accessor<IMediaData[]>;
     add: (type: 'video' | 'image', blob: Blob) => void;
     getAll: () => void;
+    downloadMedia: (id: number | string) => void;
+    deleteMedia: (id: number | string) => void;
 }
 
 interface IDbProps {
     children: JSX.Element;
 }
 
-interface IMediaData {
+export interface IMediaData {
     id: number;
     type: 'video' | 'image';
     blob: Blob;
@@ -181,9 +183,107 @@ export const DbProvider = (props: IDbProps) => {
         };
     };
 
+    const downloadMedia = (id: number | string) => {
+        const database = db();
+
+        if (!database) {
+            return;
+        }
+
+        const transaction = database.transaction('media', 'readonly');
+        const store = transaction.objectStore('media');
+
+        // get all data
+        const request = store.get(+id);
+
+        request.onsuccess = () => {
+            const media: IMediaData = request.result;
+
+            if (!media) {
+                return;
+            }
+
+            const url = URL.createObjectURL(media.blob);
+
+            media.mediaUrl = url;
+
+            if (media.type === 'video') {
+                download(media.mediaUrl, `${media.id}.mp4`);
+
+                return;
+            }
+
+            if (media.type === 'image') {
+                download(media.mediaUrl, `${media.id}.png`);
+
+                return;
+            }
+        };
+
+        request.onerror = () => {
+            console.error('error getting data');
+        };
+
+        transaction.oncomplete = () => {
+            console.log('transaction complete');
+        };
+    };
+
+    const download = (url: string, filename: string) => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+
+        a.remove();
+    };
+
+    const deleteMedia = (id: number | string) => {
+        const database = db();
+
+        if (!database) {
+            return;
+        }
+
+        const transaction = database.transaction('media', 'readwrite');
+        const store = transaction.objectStore('media');
+
+        // get all data
+        const request = store.delete(+id);
+
+        request.onsuccess = () => {
+            console.log('data deleted');
+
+            const currentMediaList = mediaList();
+
+            const updatedMediaList = currentMediaList.filter(
+                (media) => media.id !== +id
+            );
+
+            setMediaList(updatedMediaList);
+        };
+
+        request.onerror = () => {
+            console.error('error deleting data');
+        };
+
+        transaction.oncomplete = () => {
+            console.log('transaction complete');
+        };
+    };
+
     return (
         <DbContext.Provider
-            value={{ db, setDb, add, latestMedia, mediaList, getAll }}
+            value={{
+                db,
+                setDb,
+                add,
+                latestMedia,
+                mediaList,
+                getAll,
+                downloadMedia,
+                deleteMedia,
+            }}
         >
             {props.children}
         </DbContext.Provider>
