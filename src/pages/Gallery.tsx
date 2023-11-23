@@ -1,5 +1,6 @@
 import { For } from 'solid-js';
 import GalleryCard from '../components/GalleryCard';
+import Navbar from '../components/Navbar';
 import { useDbContext } from '../states/Database.context';
 
 const Gallery = () => {
@@ -38,14 +39,19 @@ const Gallery = () => {
     };
 
     return (
-        <div
-            class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-            onClick={handleAction}
-        >
-            <For each={mediaList()}>
-                {(media) => <GalleryCard media={media} />}
-            </For>
-        </div>
+        <>
+            <Navbar />
+            <div class="pb-3 pl-3 pr-3 pt-20">
+                <div
+                    class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                    onClick={handleAction}
+                >
+                    <For each={mediaList()}>
+                        {(media) => <GalleryCard media={media} />}
+                    </For>
+                </div>
+            </div>
+        </>
     );
 };
 
